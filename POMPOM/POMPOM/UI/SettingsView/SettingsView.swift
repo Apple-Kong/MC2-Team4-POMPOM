@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.presentationMode) var presentationMode
-    private let codeManager: ConnectionManager = ConnectionManager()
+    private let connectionManager = ConnectionManager.shared
     @State private var actionSheetPresented = false
     @State private var codeInput = ""
     @Binding var showAlert: Bool
@@ -45,9 +45,10 @@ struct SettingsView: View {
             }))
             .confirmationDialog("친구 연결을 해지하시겠습니까?", isPresented: $actionSheetPresented) {
                 Button("연결 해지", role: .destructive) {
-                    codeManager.deletePartnerCode { message in
+                    
+                    connectionManager.disconnectPartner { _ in
                         isPartnerConnected = false
-                        alertMessage = message
+                        alertMessage = "상대방과의 연결이 해제되었습니다."
                         showAlert = true
                     }
                 }

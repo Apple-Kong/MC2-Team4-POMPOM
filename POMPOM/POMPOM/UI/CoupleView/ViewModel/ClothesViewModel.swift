@@ -19,6 +19,7 @@ class ClothesViewModel: ObservableObject {
     
     var networkManager: ClothesManager = ClothesManager()
     
+    //Combine 대체 예정 🚧
     func requestMyClothes(completion: @escaping (Error?) -> Void) {
         if let defaultCode: String = UserDefaults.standard.string(forKey: "code") {
             print("DEBUG: requestMyClothes - userCode \(defaultCode) ")

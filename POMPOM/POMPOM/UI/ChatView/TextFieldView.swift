@@ -34,8 +34,9 @@ struct TextFieldView: View {
     }
     
     func sendMessage() async {
-        let myCode =  ConnectionManager().getCode()
-        let partnerCode = ConnectionManager().getPartnerCode()
+        let codeManager = CodeManager()
+        let myCode =  codeManager.getCode()
+        let partnerCode = codeManager.getPartnerCode()
         
         reference.addDocument(data: [
             "id": Int(Date().timeIntervalSince1970*1000),

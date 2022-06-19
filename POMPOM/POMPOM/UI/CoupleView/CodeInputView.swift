@@ -10,7 +10,7 @@ import SwiftUI
 struct CodeInputView: View {
     @Binding var textInput: String
     var delegate: NetworkDelegate?
-    private let codeManager: ConnectionManager = ConnectionManager()
+    private let connectionManager = ConnectionManager.shared
     let afterAction: () -> ()
     
     var body: some View {
@@ -21,7 +21,7 @@ struct CodeInputView: View {
         }, buttonTitle: "확인", buttonAction: {
             Task {
                 do {
-                    try await codeManager.connectWithPartner(partnerCode: textInput)
+                    try await connectionManager.connectWithPartner(partnerCode: textInput)
                 } catch ConnectionManagerResultType.success {
                     delegate?.didConnectedPartner()
                 } catch ConnectionManagerResultType.callMySelf {

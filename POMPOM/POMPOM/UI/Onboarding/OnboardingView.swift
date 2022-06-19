@@ -10,7 +10,7 @@ import SwiftUI
 struct OnboardingView: View {
     
     @Binding var isFirstLunching: Bool
-    let codeManger = ConnectionManager()
+    let codeManager = CodeManager()
     
     let onboardingViewData : [OnboardingViewModel] = [
         OnboardingViewModel(
@@ -50,7 +50,7 @@ struct OnboardingView: View {
         .tabViewStyle(PageTabViewStyle())
         .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
         .onAppear {
-            codeManger.getCode()
+            codeManager.getCode()
             print("DEBUG: get Code 호출 in ONboardign View")
         }
      }

@@ -56,7 +56,8 @@ struct CoupleView: View {
     
     @StateObject var myClothViewModel = PickerViewModel()
     @StateObject var partnerClothViewModel = ClothesViewModel()
-    var codeViewModel = ConnectionManager()
+    var connectionManager = ConnectionManager.shared
+    var codeManager = CodeManager()
     @State private var actionSheetPresented = false
     @State private var codeInput = ""
     @State private var commentInput = ""
@@ -227,7 +228,7 @@ struct CoupleView: View {
                     }, .cancel(Text("돌아가기"))])
             }
             .onAppear {
-                codeViewModel.getCode()
+                codeManager.getCode()
                 UITabBar.appearance().isHidden = true
                 
                 myClothViewModel.requestMyClothes { error in
@@ -238,24 +239,7 @@ struct CoupleView: View {
                     }
                 }
                 
-                
-                if !isConnectedPartnerStorage {
-                    Task {
-                        await codeViewModel.getPartnerCodeFromServer { partnerCode in
-                            print("DEBUG: getPartnerCodeFromServer completion")
-                            if partnerCode == "" {
-                                self.isConnectedPartner = false
-                            } else {
-                                self.isConnectedPartner = true
-                                
-                                partnerClothViewModel.addPartnerClothesListenr { error in
-                                    showCustomAlert(with: error?.localizedDescription ?? "파트너의 옷을 불러오는데 실패하였습니다")
-                                    
-                                }
-                            }
-                        }
-                    }
-                }
+                configureConnection()
             }
             
         }
@@ -269,6 +253,33 @@ struct CoupleView: View {
     func showCustomAlert(with message: String) {
         alertMessage = message
         showAlert = true
+    }
+    
+    func configureConnection() {
+        if isConnectedPartnerStorage {
+            partnerClothViewModel.addPartnerClothesListenr { error in
+                if error == nil {
+                    showCustomAlert(with: "파트너의 착장을 불러오는데 성공하였습니다")
+                } else {
+                    showCustomAlert(with: "파트너의 착장을 불러오는데 실패하였습니다")
+                }
+            }
+        }
+        
+        Task {
+            await codeManager.addListnerToPartnerCode { result in
+                switch result {
+                case .success(let isExistPartnerCode):
+                    if isExistPartnerCode {
+                        didConnectedPartner()
+                    } else {
+                        isConnectedPartner = false
+                    }
+                case .failure(let error):
+                    print("DEBUG: \(error.localizedDescription)")
+                }
+            }
+        }
     }
 }
 
@@ -288,9 +299,9 @@ extension CoupleView: NetworkDelegate {
     func didConnectedPartner() {
         partnerClothViewModel.addPartnerClothesListenr { error in
             if let error = error {
-                showCustomAlert(with: "파트너의 옷을 불러오는 데 실패하였습니다.")
+                showCustomAlert(with: "파트너의 착장을 불러오는데 실패하였습니다")
             } else {
-                isConnectedPartner = true
+                showCustomAlert(with: "파트너의 착장을 불러오는데 성공하였습니다")
             }
         }
     }

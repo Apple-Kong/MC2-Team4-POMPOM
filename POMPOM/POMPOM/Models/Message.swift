@@ -17,7 +17,7 @@ class messageData: ObservableObject{
     }
     
     func readMessages() {
-        let myCode = ConnectionManager().getCode()
+        let myCode = CodeManager().getCode()
         reference.collection("message").order(by: "timestamp", descending: false).addSnapshotListener {
             (snap, err) in
             
